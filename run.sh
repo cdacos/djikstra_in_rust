@@ -1,2 +1,3 @@
 #!/bin/sh
-target/debug/djikstra $*
+#target/debug/djikstra $*
+target/release/djikstra $*

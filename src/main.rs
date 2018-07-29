@@ -16,30 +16,29 @@ fn main() {
     }
 
     let file_path = &args[1];
-    let start_id = &args[2].parse::<u32>().expect("");
-    let end_id = &args[3].parse::<u32>().expect("");
+    let start_id = &args[2].parse::<usize>().expect("");
+    let end_id = &args[3].parse::<usize>().expect("");
 
     let f = File::open(file_path).expect("Unable to open file");
     let f = BufReader::new(f);
 
-    let mut adjacencies: HashMap<u32, Vec<Edge>> = HashMap::new();
-    let mut i = 0;
+    let mut adjacencies: HashMap<usize, Vec<Edge>> = HashMap::new();
     let mut vertices = 0;
 
-    for line in f.lines() {
+    for (i, line) in f.lines().enumerate() {
         let line = line.expect("Unable to read line");
 
         if i == 0 {
-            vertices = line.parse::<u32>().expect("Failed to parse number of vertices");
+            vertices = line.parse::<usize>().expect("Failed to parse number of vertices");
         }
         else if i < vertices + 1 {
-            adjacencies.insert(line.parse::<u32>().expect("Failed to parse vertex ID (expect u32)"), vec!());
+            adjacencies.insert(line.parse::<usize>().expect("Failed to parse vertex ID (expect usize)"), vec!());
         }
         else if i == vertices + 1 {
-            line.parse::<u32>().expect("Failed to parse number of edges");
+            line.parse::<usize>().expect("Failed to parse number of edges");
         }
         else {
-            let edge: Vec<u32> = line.split_whitespace().map(|x| x.parse::<u32>().expect("Failed to parse edge")).collect();
+            let edge: Vec<usize> = line.split_whitespace().map(|x| x.parse::<usize>().expect("Failed to parse edge")).collect();
             {
                 let mut neighbours = adjacencies.get_mut(&edge[0]).expect("?");
                 neighbours.push(Edge { id: edge[1], cost: edge[2] });
@@ -50,8 +49,6 @@ fn main() {
                 neighbours.push(Edge { id: edge[0], cost: edge[2] });
             }
         }
-
-        i += 1;
     }
 
     let shortest_path = get_shortest_path(&adjacencies, *start_id, *end_id);
@@ -64,12 +61,12 @@ fn main() {
     }
 }
 
-const MAX_DISTANCE: u32 = u32::max_value();
+const MAX_DISTANCE: usize = usize::max_value();
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 struct Edge {
-    id: u32,
-    cost: u32,
+    id: usize,
+    cost: usize,
 }
 
 // The priority queue depends on `Ord`.
@@ -92,13 +89,13 @@ impl PartialOrd for Edge {
     }
 }
 
-fn get_shortest_path(adjacencies: &HashMap<u32, Vec<Edge>>, start_id: u32, end_id: u32) -> u32 {
+fn get_shortest_path(adjacencies: &HashMap<usize, Vec<Edge>>, start_id: usize, end_id: usize) -> usize {
     if start_id == end_id {
         return 0;
     }
 
     let mut min_queue: BinaryHeap<Edge> = BinaryHeap::new();
-    let mut distances = adjacencies.keys().map(|x| (x, MAX_DISTANCE)).collect::<HashMap<&u32, u32>>();
+    let mut distances = adjacencies.keys().map(|x| (x, MAX_DISTANCE)).collect::<HashMap<&usize, usize>>();
 
     distances.entry(&start_id).or_insert(0);
     min_queue.push(Edge { id: start_id, cost: 0 });
