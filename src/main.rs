@@ -40,12 +40,12 @@ fn main() {
         else {
             let edge: Vec<usize> = line.split_whitespace().map(|x| x.parse::<usize>().expect("Failed to parse edge")).collect();
             {
-                let mut neighbours = adjacencies.get_mut(&edge[0]).expect("?");
+                let neighbours = adjacencies.get_mut(&edge[0]).expect("?");
                 neighbours.push(Edge { id: edge[1], cost: edge[2] });
             }
             // Bi-directional edge, so add the opposite direction too
             {
-                let mut neighbours = adjacencies.get_mut(&edge[1]).expect("?");
+                let neighbours = adjacencies.get_mut(&edge[1]).expect("?");
                 neighbours.push(Edge { id: edge[0], cost: edge[2] });
             }
         }
